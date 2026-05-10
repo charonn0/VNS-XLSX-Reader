@@ -1,0 +1,6 @@
+.DS_Store
+*.xojo_uistate
+.VNS-*.xojo_uistate
+Builds*/
+build/
+*.dSYM/
