@@ -4,8 +4,6 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 While `MAJOR=0`, breaking changes can occur on `MINOR` bumps.
 
-## [Unreleased]
-
 ## [0.1.0] - 2026-05-10
 
 ### Added
