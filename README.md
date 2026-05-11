@@ -1,7 +1,7 @@
 # VNS XLSX Reader
 
 [![Xojo](https://img.shields.io/badge/Xojo-2026r1-blue)](https://www.xojo.com)
-[![Version](https://img.shields.io/badge/version-0.2.0-green)](version_history.md)
+[![Version](https://img.shields.io/badge/version-0.2.1-green)](version_history.md)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Web-lightgrey)]()
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
@@ -14,7 +14,7 @@ Open any Excel workbook → one tab per sheet → cell values rendered in a List
 - 📂 **Open `.xlsx` files** via a native file dialog (Desktop) or browser upload (Web).
 - 📑 **One tab per sheet**, picked from the workbook's `<sheets>` order.
 - 🔢 **Resolves cell types**: shared strings, numbers, booleans, errors, inline strings, formulas (cached values).
-- 📅 **Excel format codes**: a pragmatic subset for numbers (`0`, `0.00`, `#,##0`, `#,##0.00`, `0%`, `0.00%`) and dates (`dd/mm/yyyy`, `yyyy-mm-dd`, `hh:mm`, `hh:mm:ss`, `yyyy-mm-dd hh:mm`); custom `numFmtId ≥ 164` from `styles.xml` honored.
+- 📅 **Excel format codes**: a pragmatic subset for numbers (`0`, `0.00`, `#,##0`, `#,##0.00`, `0%`, `0.00%`), **scientific** (`0.00E+00`), **accounting** (`_("$"* #,##0.00_)…` with parens for negatives), **currency tags** (`[$X-Y]`), and dates (`dd/mm/yyyy`, `yyyy-mm-dd`, `m/d/yy h:mm`, `hh:mm`, …); custom `numFmtId ≥ 164` from `styles.xml` honored.
 - 🔁 **Merged cells**: top-left anchor renders the value, follower cells stay blank.
 - 📏 **Auto-sized columns** with user-resizable dividers and horizontal scroll on the Desktop.
 - 🌍 **Localizable strings** via Xojo Dynamic constants (the `strings` module).

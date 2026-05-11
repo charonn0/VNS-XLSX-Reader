@@ -55,6 +55,17 @@ Protected Class XLSXStyles
 		  mNumFmts.Value(20) = "hh:mm"
 		  mNumFmts.Value(21) = "hh:mm:ss"
 		  mNumFmts.Value(22) = "yyyy-mm-dd hh:mm"
+		  ' Built-in accounting / negative-in-parens forms (Excel ids 37..44).
+		  mNumFmts.Value(37) = "#,##0 ;(#,##0)"
+		  mNumFmts.Value(38) = "#,##0 ;[Red](#,##0)"
+		  mNumFmts.Value(39) = "#,##0.00;(#,##0.00)"
+		  mNumFmts.Value(40) = "#,##0.00;[Red](#,##0.00)"
+		  mNumFmts.Value(41) = "_(* #,##0_);_(* (#,##0);_(* ""-""_);_(@_)"
+		  mNumFmts.Value(42) = "_(""$""* #,##0_);_(""$""* (#,##0);_(""$""* ""-""_);_(@_)"
+		  mNumFmts.Value(43) = "_(* #,##0.00_);_(* (#,##0.00);_(* ""-""??_);_(@_)"
+		  mNumFmts.Value(44) = "_(""$""* #,##0.00_);_(""$""* (#,##0.00);_(""$""* ""-""??_);_(@_)"
+		  mNumFmts.Value(48) = "##0.0E+0"
+		  mNumFmts.Value(49) = "@"
 		End Sub
 	#tag EndMethod
 

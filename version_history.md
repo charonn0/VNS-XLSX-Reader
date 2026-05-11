@@ -4,6 +4,23 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 While `MAJOR=0`, breaking changes can occur on `MINOR` bumps.
 
+## [0.2.1] - 2026-05-11
+
+### Added
+
+- More Excel format-code support:
+  - **Scientific notation**: `0.00E+00`, `0E+00`, `##0.0E+0` (built-in id 48).
+  - **Number with parens for negatives**: built-in ids 37–40 (`#,##0 ;(#,##0)` and variants).
+  - **Accounting**: built-in ids 41–44 — `$` prefix when present, parentheses for negatives, dash for zero. Detected via the `_(` … `_)` spacer pattern, so custom accounting codes work too.
+  - **Currency tag**: codes like `[$$-409]#,##0.00` and `[$€-2]#,##0` — symbol extracted from `[$X-Y]` and used as prefix or suffix based on position.
+  - **Text format**: `@` → cell value passes through unchanged.
+  - **More dates**: `m/d/yy h:mm`, `m/d/yyyy h:mm`, `mm/dd/yyyy`.
+- Excel built-in `numFmtId` 37–44, 48, 49 are now seeded in `XLSXStyles`. Workbooks that reference these IDs without an explicit `<numFmt>` element resolve correctly.
+
+### Behavior
+
+- The `microsoft-financial-sample.xlsx` Sale Price / Gross Sales columns now render as `$1,618.50` (accounting) instead of the raw `1618.5`.
+
 ## [0.2.0] - 2026-05-11
 
 ### Added
