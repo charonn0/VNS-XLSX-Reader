@@ -224,22 +224,48 @@ Same ToString convention via `XLSXHelpers`.
 
 ## Format-code support
 
-`XLSXFormatter` recognizes a pragmatic subset for V1. Codes are case-insensitive for date detection but case-sensitive for the `Case` match in `FormatNumberValue` / `FormatDateValue`.
+`XLSXFormatter` recognizes a pragmatic subset of Excel format codes. The numeric router walks several layers in order — simple-pattern match, scientific, accounting, currency-tag, then fallback — so adding new codes is mostly localized.
 
-**Numbers:** `""`, `General`, `0`, `0.00`, `#,##0`, `#,##0.00`, `0%`, `0.00%`
-**Dates / times:** `yyyy-mm-dd`, `dd/mm/yyyy`, `hh:mm`, `hh:mm:ss`, `yyyy-mm-dd hh:mm`
+### Numeric formats
 
-Built-in numFmt ids 0..22 (the common subset) are seeded in `XLSXStyles.SeedBuiltInNumFmts`. Custom codes from `<numFmts>` in `styles.xml` override.
+| Category | Examples | Notes |
+|---|---|---|
+| **Plain** | `0`, `0.00`, `#,##0`, `#,##0.00`, `General`, `""` (empty) | Direct dispatch in `FormatNumberValue`. |
+| **Percent** | `0%`, `0.00%` | Multiplies by 100 then formats. |
+| **Scientific** | `0.00E+00`, `0E+00`, `##0.0E+0` (Excel built-in id **48**) | Detected via `IsScientificFormat`; rendered via Xojo's framework `Format()`. |
+| **Number with parens for negatives** | `#,##0 ;(#,##0)`, `#,##0.00;(#,##0.00)` (Excel built-in ids **37–40**) | The `[Red]` color hint inside these codes is stripped by `StripColorHints`. |
+| **Accounting** | `_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)` (Excel built-in ids **41–44**) | Detected via `IsAccountingFormat` (`_(` … `_)` spacer pattern). Renders as `$ 1,618.50` for positives, `($ 1,618.50)` for negatives, `$ -` (or `-` with no currency) for zero. |
+| **Currency-tagged** | `[$$-409]#,##0.00`, `[$€-2]#,##0`, `#,##0.00\ [$€-2]` | `ExtractCurrencySymbol` parses the `[$X-Y]` tag. Position-aware — symbol is prefix if it appears before the numeric core, suffix otherwise. |
+| **Text** | `@` | Cell value passes through unchanged. |
 
-Anything not recognized falls back to `Double.ToString` for numbers or `DateTime.SQLDateTime` for dates — readable but not Excel-faithful.
+### Date / time formats
+
+`yyyy-mm-dd`, `dd/mm/yyyy`, `mm/dd/yyyy`, `m/d/yy h:mm`, `m/d/yyyy h:mm`, `hh:mm`, `hh:mm:ss`, `yyyy-mm-dd hh:mm`.
+
+The trailing `;@` text-section that Excel often appends (e.g. `m/d/yy h:mm;@`) is stripped before matching.
+
+### Built-in numFmtId seeding
+
+`XLSXStyles.SeedBuiltInNumFmts` populates the common Excel built-in IDs so workbooks that reference them without an explicit `<numFmt>` element still resolve:
+
+- **0–22** — General, integer, decimal, thousands, percent, common date / time forms.
+- **37–40** — `#,##0 ;(#,##0)` and variants (negative-in-parens).
+- **41–44** — Accounting, with and without `$` prefix, with and without 2 decimals.
+- **48** — Scientific (`##0.0E+0`).
+- **49** — Text (`@`).
+
+Custom codes declared in `<numFmts>` (id ≥ 164) override these.
 
 ### Adding a new format code
 
-1. Decide whether it's date-shaped (contains y/m/d/h/s tokens) or numeric.
-2. If numeric, add a `Case` in `XLSXFormatter.FormatNumberValue`. If date-shaped, add it in `FormatDateValue`.
-3. If detection needs more than y/m/d/h/s presence, extend `IsDateFormatCode`.
-4. If the code is one of Excel's built-in numeric ids (e.g. id 37 `#,##0 ;(#,##0)`), also add it to `XLSXStyles.SeedBuiltInNumFmts` so workbooks that reference it without an explicit `<numFmt>` entry still get the right code.
-5. Write a one-line check in `App.Opening` against a known input/output pair, run the Desktop app, verify the IDE log, then revert.
+1. Decide whether it's date-shaped (contains y/m/d/h/s outside literals) or numeric.
+2. **Date-shaped** → add a `Case` in `XLSXFormatter.FormatDateValue`. If detection needs more than y/m/d/h/s presence, extend `IsDateFormatCode`.
+3. **Numeric** → pick a tier:
+   - If it's a fixed string match (e.g. `0.0`, `#,###`), add a `Case` in `FormatNumberValue`'s primary `Select Case`.
+   - If it's a family (e.g. another currency-tag form), add a detector + renderer alongside `IsScientificFormat` / `IsAccountingFormat` / `HasCurrencyTag`.
+4. If the code is an Excel built-in id, seed it in `XLSXStyles.SeedBuiltInNumFmts` so workbooks that reference it without an explicit `<numFmt>` element resolve correctly.
+
+Unknown codes fall back to `Double.ToString` for numbers or `DateTime.SQLDateTime` for dates — readable but not Excel-faithful.
 
 ---
 
