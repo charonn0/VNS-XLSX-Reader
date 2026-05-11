@@ -18,19 +18,30 @@ Protected Module XLSXEnums
 		Unsupported = 4
 	#tag EndEnum
 
+	#tag Enum, Name = eOpenMode, Type = Integer, Flags = &h0, Description = 584C53585A6970206261636B656E642073656C6563746F723A204175746F202F204D656D6F7279202F204469736B2E0A
+		Auto = 0
+		  Memory = 1
+		Disk = 2
+	#tag EndEnum
+
 	#tag Note, Name = About
 		Enums shared by the XLSX parser.
-		
+
 		eCellType describes how a worksheet cell value should be interpreted.
 		  Empty / Str / Number / DateValue / Bool / FormulaCached / ErrorVal
-		
+
 		eParseError tags errors raised by the parser inside an XLSXException:
 		  NotAZip       - file does not start with the ZIP magic 50 4B 03 04
 		  MissingPart   - required part (e.g. xl/workbook.xml) absent
 		  MalformedXML  - an XmlDocument.LoadXml call failed
 		  Encrypted     - workbook is in the OLE-wrapped encrypted form
 		  Unsupported   - feature out of V1 scope or environment limitation
-		
+
+		eOpenMode picks the XLSXZip backend at Open time:
+		  Auto    - Memory on Xojo 2024r3+, else Disk
+		  Memory  - parse zip directory in-memory, decompress via MemoryBlock.Decompress
+		  Disk    - FolderItem.Unzip into SpecialFolder.Temporary, read parts as FolderItems
+
 		Always reference cases via the namespace, e.g. XLSXEnums.eCellType.Number.
 	#tag EndNote
 

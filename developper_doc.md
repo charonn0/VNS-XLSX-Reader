@@ -66,11 +66,12 @@ End Sub
 ```
 FolderItem (Desktop dialog) ─┐
                              │
-WebUploadedFile.File (Web) ──┴──► XLSXReader.Open ──► XLSXZip
-                                                       │
-                                                       │ (FolderItem.Unzip into temp folder)
-                                                       ▼
-                                                  shared parts
+WebUploadedFile.File (Web) ──┴──► XLSXReader.Open(file, mode) ──► XLSXZip
+                                                                   │
+                                                       (Memory: parse zip directory + MemoryBlock.Decompress)
+                                                       (Disk:   FolderItem.Unzip into SpecialFolder.Temporary)
+                                                                   ▼
+                                                              shared parts
                                   ┌─────────────┬──────┴──────┬──────────────┐
                                   ▼             ▼             ▼              ▼
                           sharedStrings   styles.xml    workbook.xml   sheetN.xml*
@@ -140,9 +141,16 @@ Both fillers:
 ### `XLSXReader` (Module)
 
 ```xojo
-Public Function Open(file As FolderItem) As XLSXWorkbook
-Public Function Open(data As MemoryBlock, sourceName As String) As XLSXWorkbook
+Public Function Open(file As FolderItem, mode As XLSXEnums.eOpenMode = Auto) As XLSXWorkbook
+Public Function Open(data As MemoryBlock, sourceName As String, mode As XLSXEnums.eOpenMode = Auto) As XLSXWorkbook
 ```
+
+`mode` picks the zip-extraction backend:
+- `Auto` — Memory on Xojo 2024r3+, else Disk (default).
+- `Memory` — pure in-memory parse + `MemoryBlock.Decompress`. No disk I/O, sandbox-friendly.
+- `Disk` — `FolderItem.Unzip` into `SpecialFolder.Temporary`.
+
+The returned workbook carries timing diagnostics: `wb.ZipMicroseconds`, `wb.XmlMicroseconds`, `wb.OpenMode`.
 
 Both raise `XLSXException` with `XLSXEnums.eParseError` set to:
 - `NotAZip` — file's first 4 bytes are not `50 4B 03 04`
@@ -157,6 +165,9 @@ Both raise `XLSXException` with `XLSXEnums.eParseError` set to:
 Public Property SourceName As String                ' filename or "<memory>"
 Public Property SharedStrings() As String           ' resolved shared-string table
 Public Property Styles As XLSXStyles
+Public Property OpenMode As XLSXEnums.eOpenMode     ' resolved backend
+Public Property ZipMicroseconds As Double           ' time spent in XLSXZip.Open
+Public Property XmlMicroseconds As Double           ' time spent on XML + sheet construction
 Public Function SheetCount() As Integer
 Public Function SheetAt(index As Integer) As XLSXSheet      ' 1-based; Nil out-of-range
 Public Function SheetByName(name As String) As XLSXSheet    ' Nil if not found

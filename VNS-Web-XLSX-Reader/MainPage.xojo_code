@@ -68,6 +68,72 @@ Begin WebPage MainPage
       Width           =   868
       _mPanelIndex    =   -1
    End
+   Begin WebCheckBox CheckboxInMemory
+      Bold            =   "False"
+      Caption         =   "#strings.kStrInMemory"
+      ControlID       =   ""
+      CSSClasses      =   ""
+      Enabled         =   True
+      FontName        =   ""
+      FontSize        =   "0.0"
+      Height          =   24
+      Index           =   -2147483648
+      Indicator       =   0
+      Italic          =   "False"
+      Left            =   16
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockHorizontal  =   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
+      LockVertical    =   False
+      PanelIndex      =   0
+      Scope           =   0
+      State           =   1
+      TabIndex        =   1
+      TabStop         =   True
+      Tooltip         =   ""
+      Top             =   56
+      Underline       =   "False"
+      Value           =   True
+      Visible         =   True
+      Width           =   180
+      _mPanelIndex    =   -1
+   End
+   Begin WebLabel LabelParseTime
+      Bold            =   "False"
+      ControlID       =   ""
+      CSSClasses      =   ""
+      Enabled         =   True
+      FontName        =   ""
+      FontSize        =   "0.0"
+      Height          =   24
+      Index           =   -2147483648
+      Indicator       =   0
+      Italic          =   "False"
+      Left            =   200
+      LockBottom      =   False
+      LockedInPosition=   False
+      LockHorizontal  =   False
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      LockVertical    =   False
+      Multiline       =   False
+      PanelIndex      =   0
+      Scope           =   0
+      TabIndex        =   2
+      Text            =   ""
+      TextAlignment   =   0
+      TextColor       =   &c777777
+      Tooltip         =   ""
+      Top             =   56
+      Underline       =   "False"
+      Visible         =   True
+      Width           =   680
+      _mPanelIndex    =   -1
+   End
    Begin WebTabPanel TabPanelSheets
       ControlCount    =   0
       ControlID       =   ""
@@ -93,10 +159,10 @@ Begin WebPage MainPage
       Scope           =   0
       SelectedPanelIndex=   0
       TabDefinition   =   "Tab 0\rTab 1"
-      TabIndex        =   1
+      TabIndex        =   3
       TabStop         =   True
       Tooltip         =   ""
-      Top             =   60
+      Top             =   92
       Visible         =   True
       Width           =   868
       _mDesignHeight  =   0
@@ -149,10 +215,10 @@ Begin WebPage MainPage
       SelectedRowColor=   &c0d6efd
       SelectedRowIndex=   0
       SelectionType   =   "0"
-      TabIndex        =   2
+      TabIndex        =   4
       TabStop         =   True
       Tooltip         =   ""
-      Top             =   100
+      Top             =   132
       Underline       =   "False"
       Visible         =   True
       Width           =   868
@@ -174,12 +240,24 @@ End
 
 	#tag Method, Flags = &h21
 		Private Sub LoadFromUploadedFile(file As WebUploadedFile)
+		  Var mode As XLSXEnums.eOpenMode
+		  If CheckboxInMemory.Value Then
+		    mode = XLSXEnums.eOpenMode.Memory
+		  Else
+		    mode = XLSXEnums.eOpenMode.Disk
+		  End If
 		  Try
-		    Var wb As XLSXWorkbook = XLSXReader.Open(file.File)
+		    Var wb As XLSXWorkbook = XLSXReader.Open(file.File, mode)
 		    mWorkbook = wb
+		    Var zipMs As Integer = Floor(wb.ZipMicroseconds / 1000.0)
+		    Var xmlMs As Integer = Floor(wb.XmlMicroseconds / 1000.0)
+		    Var totalMs As Integer = zipMs + xmlMs
 		    Self.Title = strings.kStrAppTitle + " — " + file.Name + " [" + Str(wb.SheetCount) + "]"
+		    LabelParseTime.Text = strings.kStrParseTime + Str(totalMs) + strings.kStrParseTimeUnit _
+		      + " (zip " + Str(zipMs) + " + xml " + Str(xmlMs) + ", " + wb.OpenMode.ToString + ")"
 		    RebuildTabs(wb)
 		  Catch ex As XLSXException
+		    LabelParseTime.Text = ""
 		    ShowErrorFor(ex)
 		  End Try
 		End Sub

@@ -1,7 +1,7 @@
 # VNS XLSX Reader
 
 [![Xojo](https://img.shields.io/badge/Xojo-2026r1-blue)](https://www.xojo.com)
-[![Version](https://img.shields.io/badge/version-0.1.0-green)](version_history.md)
+[![Version](https://img.shields.io/badge/version-0.2.0-green)](version_history.md)
 [![Platforms](https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Web-lightgrey)]()
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 
@@ -21,9 +21,11 @@ Open any Excel workbook → one tab per sheet → cell values rendered in a List
 - ⚠️ **Typed errors** (`XLSXException` with an `eParseError` code) so UI code can show friendly messages.
 - 🔌 **Zero external dependencies** — uses only Xojo framework classes (`FolderItem.Unzip`, `XmlDocument`, `DateTime`).
 
-## Screenshots
+## Screenshot
 
-_Coming soon._ The UI is a familiar tabs-on-top + listbox-below layout — see the developer doc for details.
+![VNS XLSX Reader desktop — Microsoft Financial Sample workbook open with the per-phase parse-time readout](screenshot.png)
+
+The Desktop window above shows the "Read in memory" checkbox and the per-phase parse-time label (`Parsed in 220 ms (zip 4 + xml 216, Memory)`). Web has the same controls.
 
 ## Quick start
 

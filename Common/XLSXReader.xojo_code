@@ -1,22 +1,36 @@
 #tag Module
 Protected Module XLSXReader
 	#tag Method, Flags = &h0, Description = 4F70656E20616E20584C53582066726F6D20612066696C65206F6E206469736B2E2052616973657320584C5358457863657074696F6E206F6E206661696C7572652E0A
-		Function Open(file As FolderItem) As XLSXWorkbook
+		Function Open(file As FolderItem, mode As XLSXEnums.eOpenMode = XLSXEnums.eOpenMode.Auto) As XLSXWorkbook
 		  If file Is Nil Or Not file.Exists Then
 		    Raise New XLSXException(XLSXEnums.eParseError.MissingPart, "file does not exist")
 		  End If
-		  Var zip As XLSXZip = XLSXZip.Open(file)
-		  Return OpenFromZip(zip, file.Name)
+		  Var t0 As Double = System.Microseconds
+		  Var zip As XLSXZip = XLSXZip.Open(file, mode)
+		  Var t1 As Double = System.Microseconds
+		  Var wb As XLSXWorkbook = OpenFromZip(zip, file.Name)
+		  Var t2 As Double = System.Microseconds
+		  wb.OpenMode = zip.Mode
+		  wb.ZipMicroseconds = t1 - t0
+		  wb.XmlMicroseconds = t2 - t1
+		  Return wb
 		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h0, Description = 4F70656E20616E20584C53582066726F6D2072617720627974657320285765622075706C6F6164292E2054686520736F757263654E616D65206973207573656420666F7220646961676E6F737469637320616E64205549207469746C652E0A
-		Function Open(data As MemoryBlock, sourceName As String) As XLSXWorkbook
+		Function Open(data As MemoryBlock, sourceName As String, mode As XLSXEnums.eOpenMode = XLSXEnums.eOpenMode.Auto) As XLSXWorkbook
 		  If data Is Nil Or data.Size = 0 Then
 		    Raise New XLSXException(XLSXEnums.eParseError.NotAZip, "empty data")
 		  End If
-		  Var zip As XLSXZip = XLSXZip.Open(data)
-		  Return OpenFromZip(zip, sourceName)
+		  Var t0 As Double = System.Microseconds
+		  Var zip As XLSXZip = XLSXZip.Open(data, mode)
+		  Var t1 As Double = System.Microseconds
+		  Var wb As XLSXWorkbook = OpenFromZip(zip, sourceName)
+		  Var t2 As Double = System.Microseconds
+		  wb.OpenMode = zip.Mode
+		  wb.ZipMicroseconds = t1 - t0
+		  wb.XmlMicroseconds = t2 - t1
+		  Return wb
 		End Function
 	#tag EndMethod
 

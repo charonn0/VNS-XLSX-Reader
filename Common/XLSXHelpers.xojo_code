@@ -80,6 +80,34 @@ Protected Module XLSXHelpers
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function ToString(Extends m As XLSXEnums.eOpenMode) As String
+		  Select Case m
+		  Case XLSXEnums.eOpenMode.Auto
+		    Return "Auto"
+		  Case XLSXEnums.eOpenMode.Memory
+		    Return "Memory"
+		  Case XLSXEnums.eOpenMode.Disk
+		    Return "Disk"
+		  End Select
+		  Return "Unknown(" + Integer(m).ToString + ")"
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0, Description = 5061727365207468652073796D626F6C6963206E616D65206F6620616E20654F70656E4D6F64652E2052657475726E7320654F70656E4D6F64652E4175746F20666F7220756E6B6E6F776E20696E7075742E0A
+		Function OpenModeFromString(s As String) As XLSXEnums.eOpenMode
+		  Select Case s
+		  Case "Auto"
+		    Return XLSXEnums.eOpenMode.Auto
+		  Case "Memory"
+		    Return XLSXEnums.eOpenMode.Memory
+		  Case "Disk"
+		    Return XLSXEnums.eOpenMode.Disk
+		  End Select
+		  Return XLSXEnums.eOpenMode.Auto
+		End Function
+	#tag EndMethod
+
 	#tag Note, Name = About
 		Project-wide helpers for the XLSX parser. Add new helper functions here rather
 		than scattering them across the modules whose types they support.

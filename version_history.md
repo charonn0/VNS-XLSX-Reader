@@ -4,6 +4,25 @@ This project follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) an
 
 While `MAJOR=0`, breaking changes can occur on `MINOR` bumps.
 
+## [0.2.0] - 2026-05-11
+
+### Added
+
+- Dual-backend `XLSXZip` chosen at Open time via a new `mode` parameter on both `XLSXReader.Open` and `XLSXZip.Open`:
+  - **Auto** (default) — Memory on Xojo 2024r3+, else Disk.
+  - **Memory** — pure in-memory zip parse + `MemoryBlock.Decompress` (no disk I/O, sandbox-friendly).
+  - **Disk** — `FolderItem.Unzip` into `SpecialFolder.Temporary` (previous behaviour).
+- Memory backend contributed by Andrew Lambert (@charonn0) — parses local file headers from a `MemoryBlock` and wraps raw deflate entries in a synthetic GZIP header so the framework `MemoryBlock.Decompress` (Xojo 2024r3+) can decompress them.
+- `XLSXEnums.eOpenMode` enum with `Extends ToString` helper.
+- Desktop: visible "Open…" button at the top-left of the main window, sharing the same handler as File → Open (Cmd-O).
+- Desktop + Web: "Read in memory" checkbox (default checked) lets the user pick the backend at runtime.
+- Desktop + Web: parse-time label with per-phase breakdown — e.g. "Parsed in 487 ms (zip 12 + xml 475, Memory)". Lets users see the ~10× zip-phase speedup of Memory vs Disk.
+- `XLSXWorkbook` exposes `OpenMode`, `ZipMicroseconds`, `XmlMicroseconds` for diagnostic timing.
+
+### Notes
+
+- The Memory backend's real benefit is sandbox-friendliness — the speed parity for the *total* parse comes from the XML-parse phase dominating (identical work in both backends). The zip-extraction phase itself is roughly 10× faster in Memory mode.
+
 ## [0.1.0] - 2026-05-10
 
 ### Added
